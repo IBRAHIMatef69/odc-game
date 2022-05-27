@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "93260256424",
+    "project_id": "odc-game",
+    "storage_bucket": "odc-game.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:93260256424:android:5e991bdb68a49edf969e9d",
+        "android_client_info": {
+          "package_name": "com.example.odc_game"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "93260256424-boilh9st27imo6o3agmduin1ts093tpi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.odc_game",
+            "certificate_hash": "59fa16da36eae8ae7ae6ff803911e2f91e893c25"
+          }
+        },
+        {
+          "client_id": "93260256424-toeh32r4r93s5ko5o8tls6chubiti5n8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaWuEtGZsUQeQNmBZ9Q_iSteusY1YAgwk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "93260256424-toeh32r4r93s5ko5o8tls6chubiti5n8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
