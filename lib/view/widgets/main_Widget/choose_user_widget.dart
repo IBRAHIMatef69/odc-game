@@ -11,63 +11,69 @@ class ChooseUserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return mainController.myData.value!=null
+      return mainController.myData.value != null
           ? SizedBox(
               height: Get.height * .05,
               child: mainController.isThereGame.value
-                  ?mainController.friendScore.value==null?SizedBox(): Row(                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-
-                children: [
-                        Hero(
-                          tag: "d",
-                          child: buildContainer(
-                              () => null,
-                              mainController.currentGame.value!.firstPlayerId ==
-                                      mainController.myUid
-                                  ? mainController
-                                      .currentGame.value!.secondPlayerName
-                                  : mainController
-                                      .currentGame.value!.firstPlayerName),
-                        ),
-                        Column(
-                          children: [
-                            KTextUtils(
-                                text: "Score",
-                                size: 15,
-                                color: mainColor2,
-                                fontWeight: FontWeight.bold,
-                                textDecoration: TextDecoration.none),
-                            KTextUtils(
-                                text: mainController.friendScore.value!.score
-                                    .toString(),
-                                size: 15,
-                                color: mainColor2,
-                                fontWeight: FontWeight.bold,
-                                textDecoration: TextDecoration.none),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            KTextUtils(
-                                text: "played games",
-                                size: 15,
-                                color: mainColor2,
-                                fontWeight: FontWeight.bold,
-                                textDecoration: TextDecoration.none),
-                            KTextUtils(
-                                text: mainController
-                                    .friendScore.value!.gamesNumber
-                                    .toString(),
-                                size: 15,
-                                color: mainColor2,
-                                fontWeight: FontWeight.bold,
-                                textDecoration: TextDecoration.none),
-                          ],
-                        ),
-                      ],
-                    )
-                  : mainController.myData.value == null
+                  ? mainController.friendScore.value == null
                       ? SizedBox()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Hero(
+                              tag: "d",
+                              child: buildContainer(
+                                  () => null,
+                                  mainController.currentGame.value!
+                                              .firstPlayerId ==
+                                          mainController.myUid
+                                      ? mainController
+                                          .currentGame.value!.secondPlayerName
+                                      : mainController
+                                          .currentGame.value!.firstPlayerName),
+                            ),
+                            Column(
+                              children: [
+                                KTextUtils(
+                                    text: "Score",
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                                KTextUtils(
+                                    text: mainController
+                                        .friendScore.value!.score
+                                        .round()
+                                        .toString(),
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                KTextUtils(
+                                    text: "played games",
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                                KTextUtils(
+                                    text: mainController
+                                        .friendScore.value!.gamesNumber
+                                        .round()
+                                        .toString(),
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                              ],
+                            ),
+                          ],
+                        )
+                  : mainController.myData.value == null||mainController.myScoreData.value==null
+                      ? SizedBox(height:2,child: LinearProgressIndicator(color: mainColor2,),)
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -86,7 +92,8 @@ class ChooseUserWidget extends StatelessWidget {
                                     textDecoration: TextDecoration.none),
                                 KTextUtils(
                                     text: mainController
-                                        .myScoreData.value!.score.round()
+                                        .myScoreData.value!.score
+                                        .round()
                                         .toString(),
                                     size: 15,
                                     color: mainColor2,
@@ -104,7 +111,8 @@ class ChooseUserWidget extends StatelessWidget {
                                     textDecoration: TextDecoration.none),
                                 KTextUtils(
                                     text: mainController
-                                        .myScoreData.value!.gamesNumber.round()
+                                        .myScoreData.value!.gamesNumber
+                                        .round()
                                         .toString(),
                                     size: 15,
                                     color: mainColor2,

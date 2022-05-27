@@ -50,6 +50,7 @@ class MainScreen extends StatelessWidget {
                             },
                             onCancel: () {
                               authController.signOutFromApp();
+                              mainController.dispose();
                             },
                             title: "Logout",
                             textConfirm: "No",

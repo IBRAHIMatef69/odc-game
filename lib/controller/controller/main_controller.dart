@@ -304,11 +304,10 @@ class MainController extends GetxController {
               .playersScore
               .doc(currentGame.value!.firstPlayerId)
               .update({
-            "score": vv['score'] + 1,
-            "gamesNumber": vv['gamesNumber'] + 1,
+            "score": vv['score'] + .5,
+            "gamesNumber": vv['gamesNumber'] + .5,
           }).then((value) {
-            Get.snackbar("updated", "score updated successfully");
-          });
+           });
         });
       }
       Get.snackbar("winner", theWinner.value);
@@ -337,7 +336,7 @@ class MainController extends GetxController {
             "score": v['score'] + .5,
             "gamesNumber": v['gamesNumber'] + .5,
           }).then((value) {
-            Get.snackbar("updated", "score updated successfully");
+
           });
         });
       }

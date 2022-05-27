@@ -5,13 +5,13 @@ class UserModel {
   String? email;
    String? phoneNumber;
   String? uid;
-  Timestamp? registerDate;
+  Timestamp? registerDate;  String? token;
 
   UserModel(
       this.displayName,
       this.uid,
       this.email,
-       this.phoneNumber,this.registerDate
+       this.phoneNumber,this.registerDate    ,this.token,
        );
 
   Map<String, dynamic> toMap() {
@@ -20,7 +20,7 @@ class UserModel {
       'uid': this.uid,
       'email': this.email,
        'phoneNumber': this.phoneNumber,
-      "registerDate":this.registerDate
+      "registerDate":this.registerDate,      'token': this.token,
      };
   }
 
@@ -31,6 +31,7 @@ class UserModel {
       map['email'],
       map['phoneNumber'],
       map['registerDate'],
+      map['token'],
       );
   }
 }

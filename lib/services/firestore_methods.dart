@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:odc_game/constants/my_string.dart';
 
 class FireStoreMethods {
@@ -15,12 +16,14 @@ class FireStoreMethods {
     uid,
     phoneNumber,
   ) async {
+    var token = await FirebaseMessaging.instance.getToken();
     users.doc(uid).set({
       'displayName': displayName,
       'uid': uid,
       'email': email,
       "phoneNumber": phoneNumber,
       "registerDate": DateTime.now(),
+    "token":token.toString()
     });
     return;
   }

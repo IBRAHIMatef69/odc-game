@@ -4,12 +4,44 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:odc_game/constants/my_string.dart';
 import 'package:odc_game/routes/routes.dart';
+ import 'package:firebase_messaging/firebase_messaging.dart';
+
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  debugPrint("on ${message.notification!.body} message ");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
   await GetStorage.init();
+
+  var token = await FirebaseMessaging.instance.getToken();
+  debugPrint(token.toString());
+  await FirebaseMessaging.instance.getNotificationSettings();
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  await messaging.requestPermission(
+    alert: true,
+    announcement: true,
+    badge: true,
+    carPlay: true,
+    criticalAlert: true,
+    provisional: true,
+    sound: true,
+  );
+  FirebaseMessaging.onMessage.listen((message) {
+
+
+  });
+  FirebaseMessaging.onMessageOpenedApp.listen((event) {
+
+
+  });
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   runApp(MyApp());
 }
 

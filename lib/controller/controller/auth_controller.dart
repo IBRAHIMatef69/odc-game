@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -65,9 +66,15 @@ class AuthController extends GetxController {
         update();
         await FireStoreMethods()
             .insertUserInfoFireStorage(name, email, uid, phoneNumber)
-            .then((v) {
-          PlayersScoreModel firstPlayersScoreModel =
-              PlayersScoreModel(score: 0, gamesNumber: 0, uid: uid, name: name);
+            .then((v) async {
+          var token = await FirebaseMessaging.instance.getToken();
+          PlayersScoreModel firstPlayersScoreModel = PlayersScoreModel(
+            score: 0,
+            gamesNumber: 0,
+            uid: uid,
+            name: name,
+            token: token.toString(),
+          );
           FireStoreMethods()
               .playersScore
               .doc(uid)

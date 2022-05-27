@@ -3,12 +3,14 @@ class PlayersScoreModel{
   dynamic gamesNumber;
   String uid;
   String name;
+  String token;
 
   PlayersScoreModel({
     required this.score,
     required this.gamesNumber,
     required this.uid,
     required this.name,
+    required this.token,
   });
 
   Map<String, dynamic> toMap(PlayersScoreModel playersScoreModel) {
@@ -17,6 +19,7 @@ class PlayersScoreModel{
     playersScoreMap['gamesNumber'] = playersScoreModel.gamesNumber;
     playersScoreMap['uid'] = playersScoreModel.uid;
     playersScoreMap['name'] = playersScoreModel.name;
+    playersScoreMap['token'] = playersScoreModel.token;
     return playersScoreMap;
   }
 
@@ -26,6 +29,7 @@ class PlayersScoreModel{
       gamesNumber: map['gamesNumber'] ,
       uid: map['uid'] as String,
       name: map['name'] as String,
+      token: map['token'] as String,
     );
   }
 }
