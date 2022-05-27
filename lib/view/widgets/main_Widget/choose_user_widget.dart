@@ -5,7 +5,7 @@ import 'package:odc_game/constants/colors.dart';
 import 'package:odc_game/controller/controller/main_controller.dart';
 import 'package:odc_game/view/widgets/utils_widgets/text_utils.dart';
 
-class ChooseUserWidget extends StatelessWidget {
+class MyOrFriendDataWidget extends StatelessWidget {
   final mainController = Get.find<MainController>();
 
   @override

@@ -36,7 +36,7 @@ class MainScreen extends StatelessWidget {
             }),
             Row(
               children: [
-                Expanded(child: Container(child: ChooseUserWidget())),
+                Expanded(child: Container(child: MyOrFriendDataWidget())),
                 Container(
                   decoration: const BoxDecoration(
                       color: mainColor2,
