@@ -67,7 +67,7 @@ class MainScreen extends StatelessWidget {
                 )
               ],
             ),
-            SizedBox(height: Get.height * .07),
+            SizedBox(height: Get.height * .02),
             GameGridView(),
             PlayerTurnWidget()
           ],

@@ -15,32 +15,25 @@ class GameGridView extends StatelessWidget {
       child: Obx(() {
         return mainController.isThereGame.value == true
             ? GridView.builder(
-                padding: EdgeInsets.all(12),
-                itemCount: 9,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisSpacing: 3, mainAxisSpacing: 5, crossAxisCount: 3),
-                itemBuilder: (BuildContext context, int index) {
-                  return gridViewItem(() {
-                    mainController.updateGameView(
-                        index: index,
-                        firstPlayerId:
-                            mainController.currentGame.value!.firstPlayerId,
-                        secondPlayerId:
-                            mainController.currentGame.value!.secondPlayerId,
-                        indexes: mainController.currentGame.value!.indexes,
-                        secondPlayerName:
-                            mainController.currentGame.value!.secondPlayerName);
-                  }, index);
-                },
-              )
-            : Center(
-                child: KTextUtils(
-                    text: "Add new game...",
-                    size: 22,
-                    color: black,
-                    fontWeight: FontWeight.w800,
-                    textDecoration: TextDecoration.none),
-              );
+          padding: EdgeInsets.all(12),
+          itemCount: 9,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisSpacing: 3, mainAxisSpacing: 5, crossAxisCount: 3),
+          itemBuilder: (BuildContext context, int index) {
+            return gridViewItem(() {
+              mainController.updateGameView(
+                  index: index,
+                  firstPlayerId:
+                  mainController.currentGame.value!.firstPlayerId,
+                  secondPlayerId:
+                  mainController.currentGame.value!.secondPlayerId,
+                  indexes: mainController.currentGame.value!.indexes,
+                  secondPlayerName:
+                  mainController.currentGame.value!.secondPlayerName);
+            }, index);
+          },
+        )
+            : allPlayersListView();
       }),
     );
   }
@@ -60,11 +53,12 @@ class GameGridView extends StatelessWidget {
               mainController.currentGame.value!.indexes == []
                   ? ""
                   : mainController.currentGame.value!.indexes.contains(index)
-                      ?   mainController.isMyMove(index).value
-                              ? "x"
-                              : "o"
-
-                      : "",
+                  ? mainController
+                  .isMyMove(index)
+                  .value
+                  ? "x"
+                  : "o"
+                  : "",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 40,
@@ -73,6 +67,105 @@ class GameGridView extends StatelessWidget {
           );
         }),
       ),
+    );
+  }
+
+  Widget allPlayersListView() {
+    return Container(
+      child: Obx(() {
+        return mainController.allUsersScoreList.isEmpty
+            ? SizedBox()
+            : ListView.separated(
+          shrinkWrap: true,
+          itemCount: mainController.allUsersScoreList.length,
+          itemBuilder: (context, index) {
+            return mainController.allUsersScoreList[index].uid ==
+                mainController.myUid
+                ? SizedBox()
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(flex: 2,
+                  child: CircleAvatar(
+                    maxRadius: Get.width * .055,
+                    child: Image.asset("assets/gamer.png"),
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(flex: 3,
+                   child: Text(
+                    mainController.allUsersScoreList[index].name,
+                    style: TextStyle(
+                      fontSize: Get.width * .055,
+                      color: mainColor4,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Expanded(flex: 5,
+                  child: Center(
+                    child: KTextUtils(
+                        text: mainController
+                            .allUsersScoreList[index].score.round()
+                            .toString(),
+                        size: Get.width * .04,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        textDecoration: TextDecoration.underline),
+                  ),
+                ),
+                Expanded(flex: 3,
+                  child: MaterialButton(
+                      onPressed: () {
+                        mainController.createGame(
+                            friendName: mainController
+                                .allUsersScoreList[index].name,
+                            friendUid: mainController
+                                .allUsersScoreList[index].uid);
+                      },
+                      color: mainColor2,
+                      child: Text(
+                        "Play",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20))),
+                ),
+              ],
+            );
+            // ListTile(
+            //         leading: CircleAvatar(
+            //           maxRadius: Get.width * .055,
+            //           child: Image.asset("assets/gamer.png"),
+            //         ),
+            //         title: Text(
+            //           mainController.allUsersScoreList[index].name,
+            //           style: TextStyle(
+            //             fontSize: Get.width * .055,
+            //             color: mainColor4,
+            //             fontWeight: FontWeight.w600,
+            //           ),
+            //         ),
+            //         trailing: MaterialButton(
+            //             onPressed: () {
+            //               mainController.createGame(
+            //                   friendName: mainController
+            //                       .allUsersScoreList[index].name,
+            //                   friendUid: mainController
+            //                       .allUsersScoreList[index].uid);
+            //             },
+            //             color: mainColor2,
+            //             child: Text(
+            //               "Play",
+            //               style: TextStyle(color: Colors.white),
+            //             ),
+            //             shape: RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.circular(20))),
+            //       );
+          }, separatorBuilder: (BuildContext context, int index) {
+          return const Divider(color: Colors.grey,thickness: .5,);
+        },);
+      }),
     );
   }
 }

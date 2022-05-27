@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:odc_game/constants/my_string.dart';
+import 'package:odc_game/model/player_score_model.dart';
 import 'package:odc_game/model/user_model.dart';
 import 'package:odc_game/services/firestore_methods.dart';
 
@@ -9,50 +10,99 @@ import '../../model/game_room_model.dart';
 
 class MainController extends GetxController {
   ///data hhhh
-  var allUsersList = <UserModel>[].obs;
+  var allUsersScoreList = <PlayersScoreModel>[].obs;
   GetStorage savedData = GetStorage();
-  List idList = <String>[];
-  UserModel? myData;
+
+  final myData = Rxn<UserModel>();
+  final myScoreData = Rxn<PlayersScoreModel>();
   String myUid = "";
   RxBool isThereGame = false.obs;
+  RxBool isFriendHaveScore = false.obs;
   final currentGame = Rxn<GameRoomModel>();
+  final friendScore = Rxn<PlayersScoreModel>();
+
   RxString theWinner = "".obs;
 
   @override
   void onInit() async {
     myUid = savedData.read(KUid);
-    getAllUsers();
-    getMyData();
-    listenGame();
+    //await getAllUsers();
+    await getMyData();
+    await getMyScoreData();
+    await listenGame();
+    await getAllUsersScore();
     theWinner.value = "";
 
     super.onInit();
   }
 
+  @override
+  void dispose() {
+    myData.value = null;
+    myScoreData.value = null;
+    allUsersScoreList.value = [];
+
+    super.dispose();
+  }
+
   ///get my data from firebase
   getMyData() {
     FireStoreMethods().users.doc(myUid).get().then((value) {
-      myData = UserModel.fromMap(value);
+      myData.value = UserModel.fromMap(value);
       update();
     });
   }
 
+  ///get my score data from firebase
+  getMyScoreData() {
+    FireStoreMethods().playersScore.doc(myUid).snapshots().listen((value) {
+      myScoreData.value = PlayersScoreModel.fromMap(value);
+      update();
+    });
+    update();
+  }
+
+  //
+  // /// get all players from firebase
+  // getAllUsers() async {
+  //   FireStoreMethods().users.snapshots().listen((event) {
+  //     allUsersList.clear();
+  //     for (int i = 0; i < event.docs.length; i++) {
+  //       allUsersList.add(UserModel.fromMap(event.docs[i]));
+  //     }
+  //   });
+  // }
+
+  /// get all players Score from firebase
+  getAllUsersScore() async {
+    FireStoreMethods()
+        .playersScore
+        .orderBy("score", descending: true)
+        .snapshots()
+        .listen((event) {
+      allUsersScoreList.clear();
+      for (int i = 0; i < event.docs.length; i++) {
+        allUsersScoreList.add(PlayersScoreModel.fromMap(event.docs[i]));
+        update();
+      }
+    });
+  }
+
   ///create game in firebase
-  createGame({required UserModel friendData}) async {
+  createGame({required String friendUid, required String friendName}) async {
     String _myUid = savedData.read(KUid);
-    final snapShot =
-    await FireStoreMethods().gameRooms.doc(friendData.uid).get();
+    final snapShot = await FireStoreMethods().gameRooms.doc(friendUid).get();
     if (snapShot.exists) {
       Get.snackbar("in game", "this player in another game");
     } else {
       GameRoomModel gameRoomModel = GameRoomModel(
           firstPlayerId: _myUid,
-          firstPlayerName: myData!.displayName!,
-          secondPlayerId: friendData.uid!,
-          secondPlayerName: friendData.displayName!,
-          lastPlayerID: friendData.uid!,
+          firstPlayerName: myData.value!.displayName!,
+          secondPlayerId: friendUid,
+          secondPlayerName: friendName,
+          lastPlayerID: friendUid,
           indexes: [],
-          playerTurnName: myData!.displayName!,
+          playerTurnName: myData.value!.displayName!,
           secondPlayerMoves: [],
           firstPlayerMoves: []);
 
@@ -63,7 +113,7 @@ class MainController extends GetxController {
             .set(gameRoomModel.toMap(gameRoomModel));
         await FireStoreMethods()
             .gameRooms
-            .doc(friendData.uid!)
+            .doc(friendUid)
             .set(gameRoomModel.toMap(gameRoomModel));
       } catch (e) {
         Get.snackbar("error", e.toString(),
@@ -78,8 +128,11 @@ class MainController extends GetxController {
     FireStoreMethods().gameRooms.doc(myUid).snapshots().listen((event) {
       if (event.exists) {
         currentGame.value = GameRoomModel.fromMap(event);
-        checkTheWinner();
+        getFriendScore2();
         isThereGame.value = true;
+
+        //getFriendScore();
+        checkTheWinner();
         update();
       } else {
         isThereGame.value = false;
@@ -88,34 +141,47 @@ class MainController extends GetxController {
     });
   }
 
-  ///function to check the winner
+  ///  get friend Score
+  getFriendScore2() {
+    if (currentGame.value != null) {
+      if (currentGame.value!.firstPlayerId == myUid) {
+        isFriendHaveScore.value = false;
 
-  checkTheWinner() {
-    if (currentGame.value!.firstPlayerMoves.containsAll(0, 1, 2) ||
-        currentGame.value!.firstPlayerMoves.containsAll(3, 4, 5) ||
-        currentGame.value!.firstPlayerMoves.containsAll(6, 7, 8) ||
-        currentGame.value!.firstPlayerMoves.containsAll(3, 4, 5) ||
-        currentGame.value!.firstPlayerMoves.containsAll(0, 3, 6) ||
-        currentGame.value!.firstPlayerMoves.containsAll(1, 4, 7) ||
-        currentGame.value!.firstPlayerMoves.containsAll(2, 5, 8) ||
-        currentGame.value!.firstPlayerMoves.containsAll(1, 4, 8) ||
-        currentGame.value!.firstPlayerMoves.containsAll(2, 4, 6)) {
-      theWinner.value = "the winner is ${currentGame.value!.firstPlayerName}";
-      Get.snackbar("winner", theWinner.value);
+        FireStoreMethods()
+            .playersScore
+            .doc(currentGame.value!.secondPlayerId)
+            .snapshots()
+            .listen((event) {
+          if (event.exists) {
+            friendScore.value = null;
+            friendScore.value = PlayersScoreModel.fromMap(event);
+            isFriendHaveScore.value = true;
 
-      update();
-    } else if (currentGame.value!.secondPlayerMoves.containsAll(0, 1, 2) ||
-        currentGame.value!.secondPlayerMoves.containsAll(3, 4, 5) ||
-        currentGame.value!.secondPlayerMoves.containsAll(6, 7, 8) ||
-        currentGame.value!.secondPlayerMoves.containsAll(3, 4, 5) ||
-        currentGame.value!.secondPlayerMoves.containsAll(0, 3, 6) ||
-        currentGame.value!.secondPlayerMoves.containsAll(1, 4, 7) ||
-        currentGame.value!.secondPlayerMoves.containsAll(2, 5, 8) ||
-        currentGame.value!.secondPlayerMoves.containsAll(1, 4, 8) ||
-        currentGame.value!.secondPlayerMoves.containsAll(2, 4, 6)) {
-      theWinner.value = "the winner is ${currentGame.value!.secondPlayerName}";
-      Get.snackbar("winner", theWinner.value);
-      update();
+            update();
+          } else {
+            isFriendHaveScore.value = false;
+            update();
+          }
+        });
+      } else {
+        isFriendHaveScore.value = false;
+        FireStoreMethods()
+            .playersScore
+            .doc(currentGame.value!.firstPlayerId)
+            .snapshots()
+            .listen((value) {
+          if (value.exists) {
+            friendScore.value = null;
+            friendScore.value = PlayersScoreModel.fromMap(value);
+            isFriendHaveScore.value = true;
+
+            update();
+          } else {
+            isFriendHaveScore.value = false;
+            update();
+          }
+        });
+      }
     }
   }
 
@@ -191,19 +257,6 @@ class MainController extends GetxController {
     }
   }
 
-  /// end game
-  endGame() async {
-    await FireStoreMethods()
-        .gameRooms
-        .doc(currentGame.value!.firstPlayerId)
-        .delete();
-    await FireStoreMethods()
-        .gameRooms
-        .doc(currentGame.value!.secondPlayerId)
-        .delete()
-        .then((value) => theWinner.value = "");
-  }
-
   ///check who should make the next move
   RxBool isMyMove(int index) {
     if (myUid == currentGame.value!.firstPlayerId) {
@@ -228,13 +281,86 @@ class MainController extends GetxController {
     }
   }
 
-  /// get all players from firebase
-  getAllUsers() async {
-    FireStoreMethods().users.snapshots().listen((event) {
-      allUsersList.clear();
-      for (int i = 0; i < event.docs.length; i++) {
-        allUsersList.add(UserModel.fromMap(event.docs[i]));
+  ///function to check the winner and update the new score
+
+  checkTheWinner() async {
+    if (currentGame.value!.firstPlayerMoves.containsAll(0, 1, 2) ||
+        currentGame.value!.firstPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.firstPlayerMoves.containsAll(6, 7, 8) ||
+        currentGame.value!.firstPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.firstPlayerMoves.containsAll(0, 3, 6) ||
+        currentGame.value!.firstPlayerMoves.containsAll(1, 4, 7) ||
+        currentGame.value!.firstPlayerMoves.containsAll(2, 5, 8) ||
+        currentGame.value!.firstPlayerMoves.containsAll(1, 4, 8) ||
+        currentGame.value!.firstPlayerMoves.containsAll(2, 4, 6)) {
+      theWinner.value = "the winner is ${currentGame.value!.firstPlayerName}";
+      if (theWinner.value != "") {
+        FireStoreMethods()
+            .playersScore
+            .doc(currentGame.value!.firstPlayerId)
+            .get()
+            .then((vv) {
+          FireStoreMethods()
+              .playersScore
+              .doc(currentGame.value!.firstPlayerId)
+              .update({
+            "score": vv['score'] + 1,
+            "gamesNumber": vv['gamesNumber'] + 1,
+          }).then((value) {
+            Get.snackbar("updated", "score updated successfully");
+          });
+        });
       }
+      Get.snackbar("winner", theWinner.value);
+
+      update();
+    } else if (currentGame.value!.secondPlayerMoves.containsAll(0, 1, 2) ||
+        currentGame.value!.secondPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.secondPlayerMoves.containsAll(6, 7, 8) ||
+        currentGame.value!.secondPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.secondPlayerMoves.containsAll(0, 3, 6) ||
+        currentGame.value!.secondPlayerMoves.containsAll(1, 4, 7) ||
+        currentGame.value!.secondPlayerMoves.containsAll(2, 5, 8) ||
+        currentGame.value!.secondPlayerMoves.containsAll(1, 4, 8) ||
+        currentGame.value!.secondPlayerMoves.containsAll(2, 4, 6)) {
+      theWinner.value = "the winner is ${currentGame.value!.secondPlayerName}";
+      if (theWinner.value != "") {
+        FireStoreMethods()
+            .playersScore
+            .doc(currentGame.value!.secondPlayerId)
+            .get()
+            .then((v) {
+          FireStoreMethods()
+              .playersScore
+              .doc(currentGame.value!.secondPlayerId)
+              .update({
+            "score": v['score'] + .5,
+            "gamesNumber": v['gamesNumber'] + .5,
+          }).then((value) {
+            Get.snackbar("updated", "score updated successfully");
+          });
+        });
+      }
+      Get.snackbar("winner", theWinner.value);
+      update();
+    }
+  }
+
+  /// end game
+  endGame() async {
+    await FireStoreMethods()
+        .gameRooms
+        .doc(currentGame.value!.firstPlayerId)
+        .delete();
+    await FireStoreMethods()
+        .gameRooms
+        .doc(currentGame.value!.secondPlayerId)
+        .delete()
+        .then((value) {
+      theWinner.value = "";
+
+      friendScore.value = null;
+      currentGame.value = null;
     });
   }
 }
@@ -250,9 +376,11 @@ extension ListExtensions<T> on List<T> {
 
 ///  extension to check if the 3 element  exists in the list
 extension ContainsAll<T> on List<T> {
-  bool containsAll(int a,
-      int b,
-      int c,) {
+  bool containsAll(
+    int a,
+    int b,
+    int c,
+  ) {
     if (contains(a) && contains(b) && contains(c)) {
       return true;
     } else {

@@ -11,15 +11,15 @@ class ChooseUserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return mainController.allUsersList.isNotEmpty
+      return mainController.myData.value!=null
           ? SizedBox(
               height: Get.height * .05,
               child: mainController.isThereGame.value
-                  ? Row(
-                      children: [
+                  ?mainController.friendScore.value==null?SizedBox(): Row(                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                children: [
                         Hero(
-                          tag: mainController
-                              .currentGame.value!.secondPlayerName,
+                          tag: "d",
                           child: buildContainer(
                               () => null,
                               mainController.currentGame.value!.firstPlayerId ==
@@ -28,36 +28,92 @@ class ChooseUserWidget extends StatelessWidget {
                                       .currentGame.value!.secondPlayerName
                                   : mainController
                                       .currentGame.value!.firstPlayerName),
-                        )
+                        ),
+                        Column(
+                          children: [
+                            KTextUtils(
+                                text: "Score",
+                                size: 15,
+                                color: mainColor2,
+                                fontWeight: FontWeight.bold,
+                                textDecoration: TextDecoration.none),
+                            KTextUtils(
+                                text: mainController.friendScore.value!.score
+                                    .toString(),
+                                size: 15,
+                                color: mainColor2,
+                                fontWeight: FontWeight.bold,
+                                textDecoration: TextDecoration.none),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            KTextUtils(
+                                text: "played games",
+                                size: 15,
+                                color: mainColor2,
+                                fontWeight: FontWeight.bold,
+                                textDecoration: TextDecoration.none),
+                            KTextUtils(
+                                text: mainController
+                                    .friendScore.value!.gamesNumber
+                                    .toString(),
+                                size: 15,
+                                color: mainColor2,
+                                fontWeight: FontWeight.bold,
+                                textDecoration: TextDecoration.none),
+                          ],
+                        ),
                       ],
                     )
-                  : ListView.separated(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return mainController.myUid !=
-                                mainController.allUsersList[index].uid!
-                            ? Hero(
-                                tag: mainController
-                                    .allUsersList[index].displayName!,
-                                child: buildContainer(
-                                  () {
-                                    mainController.createGame(
-                                        friendData:
-                                            mainController.allUsersList[index]);
-                                  },
-                                  mainController
-                                      .allUsersList[index].displayName!,
-                                ),
-                              )
-                            : SizedBox();
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(
-                          width: 8,
-                        );
-                      },
-                      itemCount: mainController.allUsersList.length),
+                  : mainController.myData.value == null
+                      ? SizedBox()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Hero(
+                              tag: "d",
+                              child: buildContainer(() => null,
+                                  mainController.myData.value!.displayName!),
+                            ),
+                            Column(
+                              children: [
+                                KTextUtils(
+                                    text: "Score",
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                                KTextUtils(
+                                    text: mainController
+                                        .myScoreData.value!.score.round()
+                                        .toString(),
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                KTextUtils(
+                                    text: "played games",
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                                KTextUtils(
+                                    text: mainController
+                                        .myScoreData.value!.gamesNumber.round()
+                                        .toString(),
+                                    size: 15,
+                                    color: mainColor2,
+                                    fontWeight: FontWeight.bold,
+                                    textDecoration: TextDecoration.none),
+                              ],
+                            ),
+                          ],
+                        ),
             )
           : SizedBox();
     });

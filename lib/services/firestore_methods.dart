@@ -6,22 +6,25 @@ class FireStoreMethods {
       FirebaseFirestore.instance.collection(usersCollectionKey);
   CollectionReference gameRooms =
       FirebaseFirestore.instance.collection(gameRoomsCollectionKey);
-  CollectionReference statusCollection =
-      FirebaseFirestore.instance.collection(statusCollectionKey);
+   CollectionReference playersScore =
+      FirebaseFirestore.instance.collection(playersScoreCollectionKey);
 
   Future<void> insertUserInfoFireStorage(
-      String displayName, email, uid, phoneNumber, ) async {
+    String displayName,
+    email,
+    uid,
+    phoneNumber,
+  ) async {
     users.doc(uid).set({
       'displayName': displayName,
       'uid': uid,
       'email': email,
-       "phoneNumber": phoneNumber,
+      "phoneNumber": phoneNumber,
       "registerDate": DateTime.now(),
-     });
+    });
     return;
   }
 
 ////////////////////////////////
-
 
 }

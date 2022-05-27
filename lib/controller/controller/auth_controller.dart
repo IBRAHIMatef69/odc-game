@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:odc_game/constants/colors.dart';
 import 'package:odc_game/constants/my_string.dart';
+import 'package:odc_game/model/player_score_model.dart';
 import 'package:odc_game/routes/routes.dart';
 import 'package:odc_game/services/firestore_methods.dart';
 
@@ -65,6 +66,12 @@ class AuthController extends GetxController {
         await FireStoreMethods()
             .insertUserInfoFireStorage(name, email, uid, phoneNumber)
             .then((v) {
+          PlayersScoreModel firstPlayersScoreModel =
+              PlayersScoreModel(score: 0, gamesNumber: 0, uid: uid, name: name);
+          FireStoreMethods()
+              .playersScore
+              .doc(uid)
+              .set(firstPlayersScoreModel.toMap(firstPlayersScoreModel));
           isLoading.value = false;
           update();
           authBox.write("auth", value.user!.uid);
