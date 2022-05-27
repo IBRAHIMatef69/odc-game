@@ -12,7 +12,10 @@ class PlayerTurnWidget extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       child: Obx(() {
-        return mainController.isThereGame.value
+
+        return
+          mainController.theWinner.value ==""?
+          mainController.isThereGame.value
             ? mainController.currentGame.value!.lastPlayerID !=
                     mainController.myUid
                 ? KTextUtils(
@@ -29,7 +32,13 @@ class PlayerTurnWidget extends StatelessWidget {
                     color: mainColor2,
                     fontWeight: FontWeight.bold,
                     textDecoration: TextDecoration.none)
-            : SizedBox();
+            : SizedBox():
+          KTextUtils(
+              text: mainController.theWinner.toString(),
+              size: Get.width * .07,
+              color: mainColor2,
+              fontWeight: FontWeight.bold,
+              textDecoration: TextDecoration.none);
       }),
     );
   }

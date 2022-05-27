@@ -24,6 +24,7 @@ class MainController extends GetxController {
     getAllUsers();
     getMyData();
     listenGame();
+    theWinner.value = "";
 
     super.onInit();
   }
@@ -40,7 +41,7 @@ class MainController extends GetxController {
   createGame({required UserModel friendData}) async {
     String _myUid = savedData.read(KUid);
     final snapShot =
-        await FireStoreMethods().gameRooms.doc(friendData.uid).get();
+    await FireStoreMethods().gameRooms.doc(friendData.uid).get();
     if (snapShot.exists) {
       Get.snackbar("in game", "this player in another game");
     } else {
@@ -51,7 +52,9 @@ class MainController extends GetxController {
           secondPlayerName: friendData.displayName!,
           lastPlayerID: friendData.uid!,
           indexes: [],
-          playerTurnName: myData!.displayName!);
+          playerTurnName: myData!.displayName!,
+          secondPlayerMoves: [],
+          firstPlayerMoves: []);
 
       try {
         await FireStoreMethods()
@@ -75,45 +78,45 @@ class MainController extends GetxController {
     FireStoreMethods().gameRooms.doc(myUid).snapshots().listen((event) {
       if (event.exists) {
         currentGame.value = GameRoomModel.fromMap(event);
+        checkTheWinner();
         isThereGame.value = true;
         update();
       } else {
         isThereGame.value = false;
+        theWinner.value = "";
       }
     });
-  }
-
-  bool listContainsAll(
-    int a,
-    int b,
-    int c,
-  ) {
-    return currentGame.value!.indexes.contains(a) &&
-        currentGame.value!.indexes.contains(b) &&
-        currentGame.value!.indexes.contains(c);
   }
 
   ///function to check the winner
 
   checkTheWinner() {
-    if (listContainsAll(0, 2, 3) ||
-        listContainsAll(3, 4, 5) ||
-        listContainsAll(6, 7, 8) ||
-        listContainsAll(3, 4, 5) ||
-        listContainsAll(0, 3, 6) ||
-        listContainsAll(1, 4, 7) ||
-        listContainsAll(2, 5, 8) ||
-        listContainsAll(1, 4, 8) ||
-        listContainsAll(2, 4, 6)) {
-      if (currentGame.value!.firstPlayerId == myUid) {
-        theWinner.value == currentGame.value!.firstPlayerName;
-        update();
-      } else {
-        theWinner.value == currentGame.value!.secondPlayerName;
-        update();
-      }
+    if (currentGame.value!.firstPlayerMoves.containsAll(0, 1, 2) ||
+        currentGame.value!.firstPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.firstPlayerMoves.containsAll(6, 7, 8) ||
+        currentGame.value!.firstPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.firstPlayerMoves.containsAll(0, 3, 6) ||
+        currentGame.value!.firstPlayerMoves.containsAll(1, 4, 7) ||
+        currentGame.value!.firstPlayerMoves.containsAll(2, 5, 8) ||
+        currentGame.value!.firstPlayerMoves.containsAll(1, 4, 8) ||
+        currentGame.value!.firstPlayerMoves.containsAll(2, 4, 6)) {
+      theWinner.value = "the winner is ${currentGame.value!.firstPlayerName}";
+      Get.snackbar("winner", theWinner.value);
+
+      update();
+    } else if (currentGame.value!.secondPlayerMoves.containsAll(0, 1, 2) ||
+        currentGame.value!.secondPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.secondPlayerMoves.containsAll(6, 7, 8) ||
+        currentGame.value!.secondPlayerMoves.containsAll(3, 4, 5) ||
+        currentGame.value!.secondPlayerMoves.containsAll(0, 3, 6) ||
+        currentGame.value!.secondPlayerMoves.containsAll(1, 4, 7) ||
+        currentGame.value!.secondPlayerMoves.containsAll(2, 5, 8) ||
+        currentGame.value!.secondPlayerMoves.containsAll(1, 4, 8) ||
+        currentGame.value!.secondPlayerMoves.containsAll(2, 4, 6)) {
+      theWinner.value = "the winner is ${currentGame.value!.secondPlayerName}";
+      Get.snackbar("winner", theWinner.value);
+      update();
     }
-    print(theWinner.value);
   }
 
   /// add new move from player
@@ -123,33 +126,69 @@ class MainController extends GetxController {
     required String secondPlayerId,
     required String secondPlayerName,
     required List indexes,
-  }) {
+  }) async {
     try {
-      if (indexes.contains(index) || currentGame.value!.lastPlayerID == myUid) {
-        Get.snackbar("taken", "not your turn");
+      if (theWinner.value == "") {
+        if (indexes.contains(index) ||
+            currentGame.value!.lastPlayerID == myUid) {
+          Get.snackbar("taken", "not your turn");
+        } else {
+          indexes.add(index);
+          await FireStoreMethods()
+              .gameRooms
+              .doc(currentGame.value!.firstPlayerId)
+              .update({
+            "indexes": indexes,
+            "lastPlayerID": myUid,
+            "playerTurnName": secondPlayerName
+          });
+          await FireStoreMethods()
+              .gameRooms
+              .doc(currentGame.value!.secondPlayerId)
+              .update({
+            "indexes": indexes,
+            "lastPlayerID": myUid,
+            "lastPlayerName": secondPlayerName
+          });
+          if (currentGame.value!.firstPlayerId == myUid) {
+            List _list = currentGame.value!.firstPlayerMoves;
+            _list.add(index);
+
+            await FireStoreMethods()
+                .gameRooms
+                .doc(currentGame.value!.firstPlayerId)
+                .update({
+              "firstPlayerMoves": _list,
+            });
+            await FireStoreMethods()
+                .gameRooms
+                .doc(currentGame.value!.secondPlayerId)
+                .update({
+              "firstPlayerMoves": _list,
+            });
+          } else if (currentGame.value!.secondPlayerId == myUid) {
+            List _list2 = currentGame.value!.secondPlayerMoves;
+            _list2.add(index);
+            await FireStoreMethods()
+                .gameRooms
+                .doc(currentGame.value!.secondPlayerId)
+                .update({
+              "secondPlayerMoves": _list2,
+            });
+            await FireStoreMethods()
+                .gameRooms
+                .doc(currentGame.value!.firstPlayerId)
+                .update({
+              "secondPlayerMoves": _list2,
+            });
+          }
+        }
       } else {
-        indexes.add(index);
-        FireStoreMethods()
-            .gameRooms
-            .doc(currentGame.value!.firstPlayerId)
-            .update({
-          "indexes": indexes,
-          "lastPlayerID": myUid,
-          "playerTurnName": secondPlayerName
-        });
-        FireStoreMethods()
-            .gameRooms
-            .doc(currentGame.value!.secondPlayerId)
-            .update({
-          "indexes": indexes,
-          "lastPlayerID": myUid,
-          "lastPlayerName": secondPlayerName
-        });
-        isMyMove(index);}
+        Get.snackbar("start new game", theWinner.value);
+      }
     } catch (e) {
       Get.snackbar("error", e.toString());
     }
-    checkTheWinner();
   }
 
   /// end game
@@ -161,29 +200,30 @@ class MainController extends GetxController {
     await FireStoreMethods()
         .gameRooms
         .doc(currentGame.value!.secondPlayerId)
-        .delete();
+        .delete()
+        .then((value) => theWinner.value = "");
   }
 
   ///check who should make the next move
-  bool isMyMove(int index) {
+  RxBool isMyMove(int index) {
     if (myUid == currentGame.value!.firstPlayerId) {
-      if (currentGame.value!.indexes.indexOf(0) == index ||
-          currentGame.value!.indexes.indexOf(2) == index ||
-          currentGame.value!.indexes.indexOf(4) == index ||
-          currentGame.value!.indexes.indexOf(6) == index ||
-          currentGame.value!.indexes.indexOf(8) == index) {
-        return true;
+      if (currentGame.value!.indexes.containsAt(index, 0) ||
+          currentGame.value!.indexes.containsAt(index, 2) ||
+          currentGame.value!.indexes.containsAt(index, 4) ||
+          currentGame.value!.indexes.containsAt(index, 6) ||
+          currentGame.value!.indexes.containsAt(index, 8)) {
+        return true.obs;
       } else {
-        return false;
+        return false.obs;
       }
     } else {
-      if (currentGame.value!.indexes.indexOf(1) == index ||
-          currentGame.value!.indexes.indexOf(3) == index ||
-          currentGame.value!.indexes.indexOf(5) == index ||
-          currentGame.value!.indexes.indexOf(7) == index) {
-        return true;
+      if (currentGame.value!.indexes.containsAt(index, 1) ||
+          currentGame.value!.indexes.containsAt(index, 3) ||
+          currentGame.value!.indexes.containsAt(index, 5) ||
+          currentGame.value!.indexes.containsAt(index, 7)) {
+        return true.obs;
       } else {
-        return false;
+        return false.obs;
       }
     }
   }
@@ -196,5 +236,27 @@ class MainController extends GetxController {
         allUsersList.add(UserModel.fromMap(event.docs[i]));
       }
     });
+  }
+}
+
+///  extension to check if the element exist at  this index
+
+extension ListExtensions<T> on List<T> {
+  bool containsAt(T value, int index) {
+    assert(this != null);
+    return index >= 0 && this.length > index && this[index] == value;
+  }
+}
+
+///  extension to check if the 3 element  exists in the list
+extension ContainsAll<T> on List<T> {
+  bool containsAll(int a,
+      int b,
+      int c,) {
+    if (contains(a) && contains(b) && contains(c)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

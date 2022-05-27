@@ -60,7 +60,7 @@ class GameGridView extends StatelessWidget {
               mainController.currentGame.value!.indexes == []
                   ? ""
                   : mainController.currentGame.value!.indexes.contains(index)
-                      ?   mainController.isMyMove(index)
+                      ?   mainController.isMyMove(index).value
                               ? "x"
                               : "o"
 

@@ -7,6 +7,8 @@ class GameRoomModel {
   String playerTurnName;
   String lastPlayerID;
   List indexes;
+  List firstPlayerMoves;
+  List secondPlayerMoves;
 
   GameRoomModel({
     required this.firstPlayerId,
@@ -15,6 +17,8 @@ class GameRoomModel {
     required this.secondPlayerName,
     required this.playerTurnName,
     required this.lastPlayerID,
+    required this.firstPlayerMoves,
+    required this.secondPlayerMoves,
     required this.indexes,
   });
 
@@ -28,6 +32,8 @@ class GameRoomModel {
 
     gameMap['playerTurnName'] = gameRoomModel.playerTurnName;
     gameMap['lastPlayerID'] = gameRoomModel.lastPlayerID;
+    gameMap['firstPlayerMoves'] = gameRoomModel.firstPlayerMoves;
+    gameMap['secondPlayerMoves'] = gameRoomModel.secondPlayerMoves;
     gameMap['indexes'] = gameRoomModel.indexes;
     return gameMap;
   }
@@ -41,6 +47,8 @@ class GameRoomModel {
       lastPlayerID: map['lastPlayerID'] as String,
       playerTurnName: map['playerTurnName'] as String,
       indexes: map['indexes'] as List,
+      firstPlayerMoves: map['firstPlayerMoves'] as List,
+      secondPlayerMoves: map['secondPlayerMoves'] as List,
     );
   }
 }
