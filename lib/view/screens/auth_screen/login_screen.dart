@@ -22,7 +22,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: homeBackGroundColor,
+      backgroundColor: mainColor3,
 
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -45,7 +45,7 @@ class LoginScreen extends StatelessWidget {
                     ),  KTextUtils(
                       text: "Start a new Game",
                       size: 17,
-                      color: black,
+                      color: mainColor2,
                       fontWeight: FontWeight.normal,
                       textDecoration: TextDecoration.none,
                     ),
@@ -68,7 +68,7 @@ class LoginScreen extends StatelessWidget {
                       KTextUtils(
                         text: "Login",
                         size: 30,
-                        color: black,
+                        color: mainColor2,
                         fontWeight: FontWeight.bold,
                         textDecoration: TextDecoration.none,
                       ),
@@ -80,7 +80,7 @@ class LoginScreen extends StatelessWidget {
                           return AuthTextFromField(
                             prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: black,
+                              color: mainColor2,
                             ),
                             suffixIcon: Text(""),
                             controller: emailController,
@@ -105,7 +105,7 @@ class LoginScreen extends StatelessWidget {
                           return AuthTextFromField(
                             prefixIcon: Icon(
                               Icons.lock_outline_rounded,
-                              color: black,
+                              color: mainColor2,
                             ),
                             suffixIcon: IconButton(
                               onPressed: () {
@@ -114,7 +114,7 @@ class LoginScreen extends StatelessWidget {
                               icon: controller.isVisibilty
                                   ? Icon(Icons.visibility_off)
                                   : Icon(Icons.visibility),
-                              color: black,
+                              color: mainColor2,
                             ),
                             controller: passwordController,
                             obscureText: controller.isVisibilty ? false : true,
@@ -140,7 +140,7 @@ class LoginScreen extends StatelessWidget {
                               child: KTextUtils(
                                 text: "Forget Password",
                                 size: 16,
-                                color: black,
+                                color: mainColor2,
                                 fontWeight: FontWeight.w400,
                                 textDecoration: TextDecoration.underline,
                               )),
@@ -172,7 +172,7 @@ class LoginScreen extends StatelessWidget {
                                 "Login",
                                 style: TextStyle(
                                     fontSize: 22,
-                                    color: Colors.black,
+                                    color: white,
                                     fontWeight: FontWeight.w700),
                               )
                             : SizedBox(
@@ -195,7 +195,7 @@ class LoginScreen extends StatelessWidget {
                   KTextUtils(
                     text: "Don’t have an account?",
                     size: 18,
-                    color: Colors.black87,
+                    color: Colors.black,
                     fontWeight: FontWeight.w500,
                     textDecoration: TextDecoration.none,
                   ),
@@ -206,7 +206,7 @@ class LoginScreen extends StatelessWidget {
                       child: KTextUtils(
                         text: "SignUp",
                         size: 18,
-                        color: black,
+                        color: mainColor2,
                         fontWeight: FontWeight.w400,
                         textDecoration: TextDecoration.underline,
                       ))

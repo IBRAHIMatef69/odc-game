@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:odc_game/constants/colors.dart';
 
-class AuthTextFromField extends StatelessWidget {
+class TextFromFieldWidget extends StatelessWidget {
   final TextEditingController controller;
   final bool obscureText;
   String hintText;
   final Function validator;
   final TextInputType textInputType;
-  final Widget prefixIcon;
-  final Widget suffixIcon;
-  Color? color;
+    Widget? prefixIcon;
+    Widget? suffixIcon;
+    Color? inputColor;
 
-  AuthTextFromField({
+
+  TextFromFieldWidget({
     Key? key,
     required this.controller,
     required this.obscureText,
     required this.validator,
     required this.hintText,
     required this.textInputType,
-    required this.prefixIcon,
+      this.prefixIcon,this.inputColor,
     required this.suffixIcon,
-    this.color
   }) : super(key: key);
 
   @override
@@ -29,34 +28,32 @@ class AuthTextFromField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
-      cursorColor: darkGrey,
-      style: TextStyle(color: color??black),
+      cursorColor: EXTFORMFIELDCOLOR,
+      style: TextStyle(color:inputColor?? PARAGRAPH.withOpacity(.6)),
       keyboardType: textInputType,
       validator: (value) => validator(value),
       decoration: InputDecoration(
-          prefixIcon: prefixIcon,
+          prefixIcon: prefixIcon ,
           suffixIcon: suffixIcon,
-          label: Text(
-            hintText,
-            style: TextStyle(color: black),
-          ),
+          // label: Text(
+          //   hintText,
+          //   style: TextStyle(color: EXTFORMFIELDCOLOR),
+          // ),
           hintText: hintText,
           hintStyle: TextStyle(
-            color: black,
-            fontSize: 16,
+            color:inputColor?? DISABLED,
+            fontSize: 13,
             fontWeight: FontWeight.w400,
           ),
           filled: true,
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: darkGrey.withOpacity(.1),
+              color: Colors.transparent,
             ),
             borderRadius: BorderRadius.circular(10),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: black,
-            ),
+            borderSide: BorderSide(color: Colors.transparent),
             borderRadius: BorderRadius.circular(10),
           ),
           errorBorder: OutlineInputBorder(
@@ -67,11 +64,12 @@ class AuthTextFromField extends StatelessWidget {
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: black,
+              color: EXTFORMFIELDCOLOR,
             ),
             borderRadius: BorderRadius.circular(10),
           ),
           errorStyle: TextStyle(fontWeight: FontWeight.bold)),
     );
   }
-}
+}const Color PARAGRAPH=Color(0xff3A3A3A);
+const Color EXTFORMFIELDCOLOR=Color(0xffF6F6F6);const Color DISABLED=Color(0xffB7B7B7);

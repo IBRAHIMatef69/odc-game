@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:odc_game/constants/my_string.dart';
 import 'package:odc_game/routes/routes.dart';
  import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:odc_game/task/figma_task.dart';
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
+   //   home: Task(),
       getPages: Routes.routes,
       initialRoute:
           savedData.read(KUid) == null ? Routes.loginScreen : Routes.mainScreen,

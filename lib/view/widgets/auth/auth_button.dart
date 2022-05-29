@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:odc_game/constants/colors.dart';
 
 class AuthButton extends StatelessWidget {
   final Function() onPressed;
@@ -30,7 +31,7 @@ class AuthButton extends StatelessWidget {
               offset: Offset(0, 3), // changes position of shadow
             ),
           ],
-          color: Colors.white,
+          color: mainColor2,
           // gradient: LinearGradient(
           //   colors: [
           //     Color(0xffcc6213),
