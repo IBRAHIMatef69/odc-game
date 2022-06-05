@@ -2,9 +2,9 @@
 
 A new Flutter project.
 
-## Getting Started
+##Online XO game with firebase and flutter  
 
-This project is a starting point for a Flutter application.
+This project was completed within one day in orange digital center flutter hackathon .
 
 A few resources to get you started if this is your first Flutter project:
 
