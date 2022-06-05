@@ -2,7 +2,7 @@
 
 A new Flutter project.
 
-##Online XO game with firebase and flutter  
+## Online XO game with firebase and flutter  
 
 This project was completed within one day in orange digital center flutter hackathon .
 
